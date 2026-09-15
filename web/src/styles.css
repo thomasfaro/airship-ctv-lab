@@ -1,0 +1,446 @@
+:root {
+  color-scheme: dark;
+  --background: #141414;
+  --surface: #2a2a2a;
+  --surface-raised: #383838;
+  --red: #e50914;
+  --muted: #b3b3b3;
+  --focus: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--background);
+  color: white;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  background: var(--background);
+  overflow-x: hidden;
+}
+
+body {
+  font-size: 24px;
+}
+
+button {
+  font: inherit;
+}
+
+.hero {
+  position: relative;
+  height: 640px;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.55) 42%, rgba(0, 0, 0, 0.08) 78%),
+    url("https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Sintel_movie_4K.webm/1920px--Sintel_movie_4K.webm.jpg")
+      center 35% / cover no-repeat,
+    #242424;
+}
+
+.hero-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, var(--background), transparent 35%);
+  pointer-events: none;
+}
+
+.topbar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  height: 120px;
+  padding: 34px 60px 0;
+  gap: 28px;
+}
+
+.brand {
+  color: var(--red);
+  font-size: 37px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.page-name {
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.platform-label {
+  color: var(--muted);
+  font-size: 20px;
+}
+
+.sdk-state {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 17px;
+  gap: 10px;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d39d00;
+}
+
+.status-dot.ready {
+  background: #42c96c;
+}
+
+.status-dot.error {
+  background: var(--red);
+}
+
+.icon-button,
+.close-button {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: white;
+  cursor: pointer;
+}
+
+.hero-copy {
+  position: absolute;
+  z-index: 1;
+  left: 60px;
+  bottom: 54px;
+  width: 700px;
+}
+
+.eyebrow,
+.section-kicker {
+  color: var(--red);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 4px;
+}
+
+h1 {
+  margin: 8px 0 10px;
+  font-size: 62px;
+  line-height: 1;
+}
+
+.metadata {
+  color: var(--muted);
+  font-size: 20px;
+}
+
+.hero-copy p {
+  max-width: 660px;
+  margin: 16px 0 24px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 21px;
+  line-height: 1.45;
+}
+
+.primary-button {
+  min-width: 190px;
+  padding: 18px 30px;
+  border: 3px solid transparent;
+  border-radius: 7px;
+  background: white;
+  color: #111;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.ghost-button {
+  min-width: 190px;
+  padding: 18px 30px;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  border-radius: 7px;
+  background: transparent;
+  color: white;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.lab-actions {
+  display: flex;
+  gap: 14px;
+}
+
+.embedded-section,
+.catalogue {
+  padding: 16px 60px 0;
+}
+
+.embedded-section {
+  position: relative;
+  z-index: 3;
+}
+
+.section-kicker {
+  margin-bottom: 10px;
+}
+
+.embedded-slot {
+  width: 100%;
+  min-height: 132px;
+  border: 2px dashed rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.035);
+  overflow: hidden;
+}
+
+.embedded-slot:has(> :not(.embedded-placeholder)) {
+  border-color: transparent;
+}
+
+.embedded-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 128px;
+  color: var(--muted);
+  font-size: 18px;
+  gap: 18px;
+}
+
+.embedded-placeholder strong {
+  color: white;
+  font-family: monospace;
+}
+
+.catalogue {
+  padding-bottom: 90px;
+}
+
+.catalogue h2 {
+  margin: 36px 0 16px;
+  font-size: 32px;
+}
+
+.card-row {
+  display: flex;
+  gap: 16px;
+}
+
+.card {
+  position: relative;
+  flex: 0 0 350px;
+  height: 196px;
+  padding: 0;
+  overflow: hidden;
+  border: 4px solid transparent;
+  border-radius: 8px;
+  background-position: center;
+  background-size: cover;
+  color: white;
+  text-align: left;
+  cursor: pointer;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.92), transparent 65%);
+}
+
+.card-copy {
+  position: absolute;
+  z-index: 1;
+  right: 16px;
+  bottom: 17px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-copy strong {
+  font-size: 21px;
+}
+
+.card-copy small {
+  color: #d3d3d3;
+  font-size: 16px;
+}
+
+.progress {
+  position: absolute;
+  z-index: 2;
+  right: 14px;
+  bottom: 7px;
+  left: 14px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.progress i {
+  display: block;
+  height: 100%;
+  background: var(--red);
+}
+
+.card-tears {
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Tears_of_Steel_1080p.webm/960px--Tears_of_Steel_1080p.webm.jpg");
+}
+
+.card-cosmos {
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Cosmos_Laundromat_-_First_Cycle_-_Official_Blender_Foundation_release.webm/960px--Cosmos_Laundromat_-_First_Cycle_-_Official_Blender_Foundation_release.webm.jpg");
+}
+
+.card-elephants {
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Elephants_Dream_%282006%29.webm/960px--Elephants_Dream_%282006%29.webm.jpg");
+}
+
+.card-spring {
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Spring_-_Blender_Open_Movie.webm/960px--Spring_-_Blender_Open_Movie.webm.jpg");
+}
+
+.card-bunny {
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Big_Buck_Bunny_4K.webm/960px--Big_Buck_Bunny_4K.webm.jpg");
+}
+
+.card-llama {
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Caminandes%2C_Gran_Dillama_-_Blender_Foundation.webm/960px--Caminandes%2C_Gran_Dillama_-_Blender_Foundation.webm.jpg");
+}
+
+.card-sintel {
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Sintel_movie_4K.webm/960px--Sintel_movie_4K.webm.jpg");
+}
+
+[data-focusable]:focus {
+  z-index: 20;
+  outline: 5px solid var(--focus);
+  outline-offset: 5px;
+  transform: scale(1.045);
+  box-shadow: 0 0 0 8px rgba(229, 9, 20, 0.85);
+}
+
+/* No transform here: a Scene's focusable is the page container the Thomas
+   pager translates, and any transform of ours replaces that translation. */
+.embedded-slot :focus {
+  z-index: 20;
+  outline: 5px solid var(--focus);
+  outline-offset: -5px;
+}
+
+.lab-panel,
+.player {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: none;
+}
+
+.lab-panel.open,
+.player.open {
+  display: grid;
+}
+
+.lab-panel {
+  place-items: center;
+  background: rgba(0, 0, 0, 0.84);
+}
+
+.lab-card {
+  width: 980px;
+  padding: 52px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  background: #202020;
+}
+
+.lab-card h2 {
+  margin: 8px 0 28px;
+  font-size: 44px;
+}
+
+.lab-card dl {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  margin: 0;
+  font-size: 20px;
+  gap: 10px 20px;
+}
+
+.lab-card dt {
+  color: var(--muted);
+}
+
+.lab-card dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-family: monospace;
+}
+
+.lab-card pre {
+  max-height: 180px;
+  margin: 26px 0;
+  padding: 18px;
+  overflow: auto;
+  border-radius: 7px;
+  background: #101010;
+  color: #d5d5d5;
+  font-size: 15px;
+  white-space: pre-wrap;
+}
+
+.player {
+  background: black;
+}
+
+.player video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.player-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.85), transparent 35%);
+  pointer-events: none;
+}
+
+.player-title {
+  position: absolute;
+  bottom: 64px;
+  left: 64px;
+}
+
+.player-title h2 {
+  margin: 8px 0 0;
+  font-size: 46px;
+}
+
+.close-button {
+  position: absolute;
+  top: 48px;
+  right: 54px;
+  font-size: 42px;
+}
+
+@media (max-width: 1100px) {
+  body {
+    font-size: 18px;
+  }
+
+  .hero {
+    height: 500px;
+  }
+
+  .card {
+    flex-basis: 280px;
+    height: 158px;
+  }
+}

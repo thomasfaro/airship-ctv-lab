@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <title>CTV Lab</title>
+    <!-- /play/<film-id> is served as this page, so assets must resolve from the root. -->
+    <base href="/" />
+    <link rel="icon" href="icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="airship-config.js"></script>
+  </head>
+  <body>
+    <main id="app">
+      <section class="hero">
+        <div class="hero-shade"></div>
+        <header class="topbar">
+          <div class="brand">CTVLAB</div>
+          <div class="page-name">Home</div>
+          <div id="platform-label" class="platform-label">HTML5 TV</div>
+          <div class="sdk-state">
+            <span id="sdk-dot" class="status-dot"></span>
+            <span id="sdk-status">Airship loading…</span>
+          </div>
+          <button
+            class="icon-button"
+            type="button"
+            data-focusable
+            data-action="show-lab"
+            aria-label="Airship Lab"
+          >
+            <span aria-hidden="true">⌁</span>
+          </button>
+        </header>
+
+        <div class="hero-copy">
+          <div class="eyebrow">N&nbsp;&nbsp; SERIES</div>
+          <h1>Sintel</h1>
+          <div class="metadata">2010&nbsp;&nbsp;·&nbsp;&nbsp;13+&nbsp;&nbsp;·&nbsp;&nbsp;15m</div>
+          <p>
+            A lone wanderer crosses a hostile world to find the baby dragon that
+            was taken from her, and pays for it.
+          </p>
+          <button class="primary-button" type="button" data-focusable data-action="play">
+            <span aria-hidden="true">▶</span> Play
+          </button>
+        </div>
+      </section>
+
+      <section class="embedded-section" aria-label="Airship Embedded Content (top)">
+        <div class="section-kicker">AIRSHIP EMBEDDED SCENE — TOP</div>
+        <div
+          id="airship-home-top"
+          class="embedded-slot"
+          rel="airship-embedded-top"
+          aria-label="Airship home top banner"
+        >
+          <div class="embedded-placeholder">
+            <strong>home_top</strong>
+            <span>Waiting for eligible Airship Web content</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="embedded-section" aria-label="Airship Embedded Content">
+        <div class="section-kicker">AIRSHIP EMBEDDED SCENE</div>
+        <div
+          id="airship-home-banner"
+          class="embedded-slot"
+          rel="airship-embedded-banner"
+          aria-label="Airship home banner"
+        >
+          <div class="embedded-placeholder">
+            <strong>home_banner</strong>
+            <span>Waiting for eligible Airship Web content</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="catalogue" aria-label="Catalogue">
+        <h2>Continue Watching</h2>
+        <div class="card-row">
+          <button class="card card-tears" type="button" data-focusable data-film="tears-of-steel">
+            <span class="card-copy"><strong>Tears of Steel</strong><small>41% watched</small></span>
+            <span class="progress"><i style="width: 41%"></i></span>
+          </button>
+          <button class="card card-cosmos" type="button" data-focusable data-film="cosmos-laundromat">
+            <span class="card-copy"><strong>Cosmos Laundromat</strong><small>64% watched</small></span>
+            <span class="progress"><i style="width: 64%"></i></span>
+          </button>
+          <button class="card card-elephants" type="button" data-focusable data-film="elephants-dream">
+            <span class="card-copy"><strong>Elephants Dream</strong><small>18% watched</small></span>
+            <span class="progress"><i style="width: 18%"></i></span>
+          </button>
+        </div>
+
+        <h2>Trending Now</h2>
+        <div class="card-row">
+          <button class="card card-spring" type="button" data-focusable data-film="spring">
+            <span class="card-copy"><strong>Spring</strong><small>Drama</small></span>
+          </button>
+          <button class="card card-bunny" type="button" data-focusable data-film="big-buck-bunny">
+            <span class="card-copy"><strong>Big Buck Bunny</strong><small>Animation</small></span>
+          </button>
+          <button class="card card-llama" type="button" data-focusable data-film="caminandes-llamigos">
+            <span class="card-copy"><strong>Caminandes</strong><small>Comedy</small></span>
+          </button>
+          <button class="card card-sintel" type="button" data-focusable data-film="sintel">
+            <span class="card-copy"><strong>Sintel</strong><small>Fantasy</small></span>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <aside id="lab-panel" class="lab-panel" aria-hidden="true">
+      <div class="lab-card">
+        <div class="eyebrow">AIRSHIP WEB SDK</div>
+        <h2>CTV Lab</h2>
+        <dl>
+          <dt>Platform</dt><dd id="lab-platform">—</dd>
+          <dt>Channel ID</dt><dd id="channel-id">—</dd>
+          <dt>Named user</dt><dd>thomasfctv</dd>
+          <dt>Embedded IDs</dt><dd>home_top, home_banner</dd>
+          <dt>Secure context</dt><dd id="secure-context">—</dd>
+        </dl>
+        <pre id="diagnostic">Starting…</pre>
+        <div class="lab-actions">
+          <button type="button" class="primary-button" data-focusable data-action="close-lab">
+            Close
+          </button>
+          <button type="button" class="ghost-button" data-focusable data-action="reset-channel">
+            Reset channel
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <aside id="player" class="player" aria-hidden="true">
+      <video
+        id="video"
+        src="https://media.w3.org/2010/05/sintel/trailer.mp4"
+        playsinline
+        preload="metadata"
+      ></video>
+      <div class="player-shade"></div>
+      <div class="player-title">
+        <div class="eyebrow">NOW PLAYING</div>
+        <h2 id="player-name">Sintel</h2>
+      </div>
+      <button
+        type="button"
+        class="close-button"
+        data-focusable
+        data-action="close-player"
+        aria-label="Close player"
+      >
+        ×
+      </button>
+    </aside>
+
+    <script src="app.js"></script>
+  </body>
+</html>

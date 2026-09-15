@@ -1,0 +1,26 @@
+.DS_Store
+.idea/
+*.iml
+.gradle/
+**/build/
+local.properties
+config/airship.local.properties
+apple/CTVLab/AirshipSecrets.swift
+**/xcuserdata/
+**/*.xcuserstate
+DerivedData/
+.swiftpm/
+.kotlin/
+web/dist/
+.netlify/
+captures/
+*.apk
+*.aab
+*.ap_
+*.ipk
+*.wgt
+*.keystore
+.cxx/
+
+# Local Netlify folder
+.netlify

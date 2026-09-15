@@ -1,0 +1,17 @@
+# Copy this file to airship.local.properties (gitignored) and fill in
+# credentials from the Airship dashboard: Project details.
+#
+# M6+ / EU projects should keep site=eu.
+
+airship.appKey=YOUR_APP_KEY
+airship.appSecret=YOUR_APP_SECRET
+airship.site=eu
+
+# Web channel credentials from Settings → Channels → Web → Install SDK.
+# They are required by the Samsung Tizen / LG webOS Web SDK lab.
+# Never put airship.appSecret in the generated HTML app.
+airship.webToken=YOUR_WEB_TOKEN
+airship.webVapidPublicKey=YOUR_WEB_VAPID_PUBLIC_KEY
+airship.webDefaultIcon=
+airship.webDefaultTitle=CTV Lab
+airship.webDefaultActionURL=

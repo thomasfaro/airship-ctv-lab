@@ -1,0 +1,91 @@
+name: CTVLab
+options:
+  bundleIdPrefix: com.airship
+  deploymentTarget:
+    tvOS: "18.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+packages:
+  Airship:
+    url: https://github.com/urbanairship/ios-library
+    from: "20.0.0"
+targets:
+  CTVLab:
+    type: application
+    platform: tvOS
+    sources:
+      - path: CTVLab
+        excludes:
+          - "AirshipSecrets.swift.example"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.airship.ctvlab
+        PRODUCT_NAME: CTV Lab
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "6.0"
+        TARGETED_DEVICE_FAMILY: "3"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: CTV Lab
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UIUserInterfaceStyle: Dark
+        CODE_SIGN_STYLE: Automatic
+        ENABLE_PREVIEWS: YES
+    info:
+      path: CTVLab/Info.plist
+      properties:
+        UIBackgroundModes:
+          - remote-notification
+        CFBundleURLTypes:
+          - CFBundleTypeRole: Editor
+            CFBundleURLName: com.airship.ctvlab
+            CFBundleURLSchemes:
+              - ctvlab
+    dependencies:
+      - package: Airship
+        product: AirshipCore
+      - package: Airship
+        product: AirshipAutomation
+      - package: Airship
+        product: AirshipMessageCenter
+      - package: Airship
+        product: AirshipPreferenceCenter
+      - package: Airship
+        product: AirshipFeatureFlags
+    preBuildScripts:
+      - name: Generate AirshipSecrets
+        basedOnDependencyAnalysis: false
+        script: |
+          "${SRCROOT}/../scripts/generate-airship-secrets.sh"
+  # tvOS offers no way to send remote presses from the host, so navigation is driven from a UI test.
+  CTVLabUITests:
+    type: bundle.ui-testing
+    platform: tvOS
+    sources:
+      - CTVLabUITests
+    dependencies:
+      - target: CTVLab
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.airship.ctvlab.uitests
+        SWIFT_VERSION: "6.0"
+        TARGETED_DEVICE_FAMILY: "3"
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: CTVLab
+        CODE_SIGN_STYLE: Automatic
+
+schemes:
+  CTVLab:
+    build:
+      targets:
+        CTVLab: all
+        CTVLabUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      # Xcode's own tools aren't the selected developer directory here, so lldb can't be staged and
+      # the runner dies before the first test. The driver only needs to press keys and print.
+      debugEnabled: false
+      targets:
+        - CTVLabUITests

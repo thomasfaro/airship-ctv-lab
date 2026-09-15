@@ -1,0 +1,104 @@
+---
+description: Airship project and MCP for CTV Lab tests
+alwaysApply: true
+---
+
+# Airship project
+
+This lab talks to the **Training app** Airship project (EU). Use the **Training app** MCP (`user-Training app`) for all Push / Message Center / channel lookups. Do not use other Airship MCP apps unless asked.
+
+- Named user identified at launch: `thomasfctv`
+- Device tags: `ctv_lab` + `google_tv` (Android) or `tvos` (tvOS)
+- Embedded Scene ID on home: `home_banner`
+- Google TV channel is **not push opted-in** (`opt_in: false`). Send Message Center with `send_alert: false`. A regular push will not arrive.
+
+When testing inbox autonomously, send via `send_message_center_message` to named user `thomasfctv` (or tag `ctv_lab`). Then open the home bell so the inbox can refresh.
+
+Since the channel gets no push, the unread badge only updates when the home screen regains focus (`AirshipLab.refreshInbox()`) or when the inbox is opened.
+
+## Embedded Scene slot (`home_banner`)
+
+The slot in `ui/home/HomeScreen.kt` takes the full content width (864 dp / 1728 px at 1920×1080) and reports **both** dimensions, the height being the width over the banner ratio the Scenes are authored against (`BannerAspectRatio`, 1800 × 560). A placement sized `auto` still sizes itself to its content inside that box.
+
+A Scene only renders here if every height resolves to something, and that is why the height is reported. While it was left unbounded a percentage had nothing to resolve against and fell back to `MATCH_PARENT`: an all-percentage chain around a `media` then collapsed to the tallest view carrying an intrinsic size (48 dp for a dismiss button, 68 dp for a label) — measured on the monthly-releases carousel, which rendered as an invisible 48 dp strip while the SDK reported a healthy `IN_APP_DISPLAY` and four pager pages. An all-`auto` chain around a `media` collapses the same way. `ThomasEmbeddedView` reads the size from the placement, so nothing here is overridable from the app beyond what it reports as the parent size.
+
+Three shapes are known to work: percentages (now that the height is reported), a fixed-height container anywhere in the chain, or an all-`auto` chain whose leaves are text and buttons rather than media. The Scene currently published is a 4-page pager of `media` sized `100%`, which auto-advances on story timers.
+
+Everything the Scene draws is authored in the dashboard, including the dismiss cross that used to sit top-end (`image_button`, `identifier: "dismiss_button"`) and the CTA's colours. Thomas draws **no focus state** for any of it, so the slot carries the app's own focus ring instead, keyed on `hasFocus` of the wrapping `Box`.
+
+Two things the app has to correct for a Scene to be usable with a D-pad. They live in `airship/ThomasFocus.kt`, because they apply to every Thomas layout and not just the embedded one — a modal or a banner renders in one of Airship's own activities (`com.urbanairship.android.layout.…`), which the app cannot wrap, so `correctThomasFocus()` (called from `CtvApplication`) hooks those activities as they start and applies the same passes to their decor view. A modal additionally needs the focus handed to a control once the containers defer, since the pager holds it and nothing re-dispatches on its own.
+
+- Thomas wraps a Scene in a pager whose `FrameLayout` and `RecyclerView` are focusable with `FOCUS_BEFORE_DESCENDANTS`, so the pager takes the focus and the Scene's own buttons are never reached. Walking the `ThomasEmbeddedView` subtree and switching those to `FOCUS_AFTER_DESCENDANTS` lets the CTA take focus, and keeps the pager focusable as a fallback for a Scene with nothing to focus.
+- `verticalScroll` does not follow focus into an interop view, so the band stays pinned to the screen edge once the CTA is focused. A `BringIntoViewRequester` fired from `onFocusChanged` brings it in.
+- A pager drops the focused page when it advances — on a CTA carrying `pager_next` or on a story timer — and re-dispatches nothing, so the focus search hands the focus to whatever the app draws next to the band (a catalogue tile here). `keepFocusThroughPageChanges()` puts it back on the page that replaced it. The event says nothing useful: the page is already detached when it fires, so `oldFocus` arrives as `null` and the listener has to remember the focus was inside. A deliberate exit is told apart by the last key pressed — only a directional one means the user asked to leave — which is why a `Window.Callback` wrapper records those presses for every activity. The recovery retries until the new page is laid out (the first pass reports a control of zero size), targets the largest visible control, and ends with `requestRectangleOnScreen` since the focus search had already scrolled its own candidate into view.
+- A dismiss cross drawn over a full-width button is unreachable, because focus search only accepts a candidate lying in the direction pressed and this one sits inside the button's bounds. Any control whose bounds are contained in another focusable view's is linked by hand with `nextFocusRightId` / `nextFocusLeftId`, left and right being free in these layouts while up and down walk their content. The host doesn't have to be a control: in the modal the cross sits over the scrolling body, so the candidate is any focusable view, minus the pager itself — recognised as the non-clickable container that holds every control. The wiring has to be redone on every layout pass: a Scene sizes itself as its media loads, and the first pass reports a button of zero height, so an `OnLayoutChangeListener` drives it rather than a one-shot at attach.
+
+A CTA with `button_click: ["dismiss"]` reports `IN_APP_PAGER_SUMMARY` and finishes the schedule, so the band disappears until the schedule is re-prepared — expected, and the placeholder takes over.
+
+## Deep links (Android)
+
+`ctvlab://` is declared on `MainActivity` (`singleTop`, so a running app is handed the link through `onNewIntent`). Airship's deep link action fires a VIEW intent at the package, so no `AirshipDeepLinkListener` is needed and `adb shell am start -a android.intent.action.VIEW -d "<uri>"` tests the same path the Scene takes.
+
+- `ctvlab://play/<film-id>` — ids are the `Catalog` film ids (`sintel`, `spring`, `big-buck-bunny`, `tears-of-steel`, `elephants-dream`, `cosmos-laundromat`, `caminandes-gran-dillama`, `caminandes-llamigos`). An unknown id is ignored rather than routed anywhere.
+- `ctvlab://inbox`, `ctvlab://lab`, `ctvlab://home`
+
+On tvOS the same scheme is registered (`CFBundleURLTypes` in `project.yml`). `AppDelegate` + `onOpenURL` handle `xcrun simctl openurl … ctvlab://…` and system delivery; Scene CTAs go through `Airship.deepLinkDelegate` (`DeepLinkForwarder` in `AirshipBootstrap.swift`) because the SDK does not bounce those as a system URL when a delegate is set. Both call `DeepLinks.open`, which presents lab / inbox / player as a `fullScreenCover` (a nested `NavigationStack` around `MessageCenterView` pops immediately). Unknown film ids are ignored.
+
+## tvOS (SDK 20.11.0, Apple TV 4K simulator)
+
+There is no `adb shell input` equivalent. Remote presses come from `apple/CTVLabUITests/RemoteDriver.swift` (`XCUIRemote`). `tap()` is unavailable on tvOS, so a test either walks there with the remote or launches the app with `--open-inbox` (`TEST_RUNNER_CTVLAB_OPEN_INBOX=1`). Point `DEVELOPER_DIR` at `/Applications/Xcode.app` — `xcode-select` is the Command Line Tools.
+
+### Focus geometry on the home screen
+
+Directional focus search only considers a candidate that overlaps the source along the axis pressed, and the home bell shares its row with nothing and its column with nothing — so Up and Right from Play both stayed on Play even though the bell was in the accessibility tree. `.focusSection()` on the top bar `HStack` overlaying the hero (`HomeView.swift`) turns the whole bar into a region Up can land in; Select on the bell then opens the Message Center. Same failure mode as the Scene's dismiss cross, minus the containment, so the app-side fix differs.
+
+### Launch modal (Thomas overlay)
+
+The CTA (`I'M IN`) receives focus on appear — unlike Android, no first-control handoff is needed. After that the focus is stuck: up/down/left/right never leave the CTA, so the Close `xmark` (present in the accessibility tree) is unreachable. **Menu does not dismiss the modal; it leaves the app.** Select fires the CTA (here: system Settings). A live modal therefore bricks the rest of the app. `inAppAutomation.isPaused` also hides embedded Scenes (same engine). An `InAppMessageDisplayDelegate` that returns `false` for overlays leaves the schedule pending and **blocks the embedded Scene queued behind it**. Canceling that schedule from the app is a test-only lever, not product behaviour. Pause the campaign in the dashboard instead.
+
+### Embedded Scene (`home_banner`)
+
+Renders. The full-width CTA is a real focusable `Button` (1640×168); Down from Play reaches it, Down from it leaves to the catalogue. Close `xmark` sits inside that button's bounds and is **not** reachable with Right/Left — same overlay geometry as Android, but here the SDK draws the CTA as a focusable control without any app-side `FOCUS_AFTER_DESCENDANTS` patch. It is reachable from the home bell, which happens to share its column (bell at x1715, cross at x1732), and Down from the cross falls to the CTA; that path is an accident of layout, not a designed one, and nothing app-side can create a better one because the cross is a SwiftUI view drawn by the SDK with no equivalent of Android's `nextFocusRightId`. Down from the bell can never reach Play (x136, no overlap), so removing the cross from the Scene leaves the bell landing on the full-width CTA instead. Select on the CTA did not change the focused element (action either no-ops on tvOS or does not map from `XCUIRemote.select`). Thomas still exposes no visible focus treatment of its own; tvOS draws the system focus outrigger on the whole button.
+
+### Message Center
+
+Default `MessageCenterView()` **is** usable with the remote for the list, unlike Android: list rows are Buttons, they take focus, Select opens a message, Right from Back reaches **Delete**, Left returns, Menu pops to the list. `NavigationStyle.auto` uses a stack on tvOS (split is `.pad` only). An HTML body cannot render at all: WebKit is not in the tvOS SDK, so `MessageCenterMessageContentView` compiles its `#if canImport(WebKit)` branch away and `.html` / `.plain` / `.unknown` fall to a hardcoded `ua_mc_failed_to_load` label. No request is ever made, and the phase stays `.loading`, so the spinner spins forever with the (0-opacity) failure label behind it and no retry button. Only `.native` content (`application/vnd.urbanairship.thomas+json`, authored as a Scene-based Message Center message) has a renderer on tvOS — `MessageCenterThomasView` carries no platform guard, and Thomas is known to draw here. Accessibility labels mash title + unread + date into one string. Nested `NavigationStack` (app + SDK) is easy to create because `MessageCenterView` already provides one.
+
+A Google TV emulator left running for days drifts: its clock stopped at the boot date while `auto_time` stayed on. Ping still worked but every Airship call failed as `RetriableError(statusCode=null)` — no HTTP response, the signature of a TLS failure on a skewed clock — so remote data never refreshed and the engine kept rendering the snapshot it had prepared weeks earlier. Nothing in the app or dashboard explains that symptom; compare `adb shell date +%s` with the host before looking further, and cold-boot the AVD (`-no-snapshot-load`) to resync.
+
+The definition the SDK renders lives in the Room store `no_backup/<appkey>_automation_store`, not only in `..._ua_remotedata.db`; both hold a copy and the engine reads the former. Patching those by hand works for one-off tests but corrupts easily, and deleting them leaves the engine with no schedules while remote data answers 304 — reset with `adb shell pm clear com.airship.ctvlab` (this rotates the channel ID; the named user re-identifies itself).
+
+## Samsung Tizen / LG webOS (experimental Web SDK)
+
+`web/` is one shared HTML5 CTV app built into browser, Tizen, and webOS packages. It uses Web SDK v2, creates an opted-out Web channel, identifies `thomasfctv`, adds `ctv_lab` plus `tizen` / `webos` in the `device` tag group, tracks screen `home`, and registers two Embedded Content IDs on the home screen: `#airship-home-top` (`home_top`) above `#airship-home-banner` (`home_banner`). Both slots carry the same class, so they take the full content width and leave the height to the Scene; the pairs are declared once as `embeddedSlots` in `web/scripts/build.mjs` and read from `window.CTVLAB_CONFIG`.
+
+These TV browsers are not officially supported by the Airship Web SDK and the SDK requires a secure context. Both TV packages are hosted-web-app wrappers around `https://airship-ctv-web-lab.netlify.app/`, with `?platform=tizen` / `?platform=webos` selecting the correct tag. Every TV URL also carries `ntl-drawer-state=hidden`, because Netlify otherwise injects a focusable public HUD iframe. The Lab panel shows `window.isSecureContext`, channel ID, and initialization errors.
+
+The App Key is shared with the native apps, but the mobile App Secret must never be copied into HTML. The ignored `config/airship.local.properties` also needs `airship.webToken` and `airship.webVapidPublicKey` from Training app → Settings → Channels → Web → Install SDK. `npm run build` generates a safe `airship-config.js` containing only Web credentials.
+
+The player is addressable, so a Web Scene CTA targets a URL instead of a scheme: `/play/<film-id>` (Netlify rewrite `/play/*` → `index.html`, written as `_redirects`; `npm run serve` mirrors it, hence `<base href="/">`) or `?play=<film-id>`, with the same film ids as the native labs and an unknown id ignored. Both forms preserve the other query parameters, so `?platform=tizen&ntl-drawer-state=hidden` survives, and opening or closing the player rewrites the address bar through `replaceState`.
+
+The app provides spatial D-pad navigation for app-owned controls. Once focus enters `home_banner`, it deliberately stops handling arrows so tests measure the SDK/browser's actual Scene focus behavior.
+
+A Web channel is stored per origin, so `http://localhost:4173` and the Netlify deployment are two different channels and a Scene seen on one says nothing about the other. Dismissing an embedded Scene through its cross finishes the schedule for that channel and it does **not** come back on reload, even with `limit: 0` and no audience on the schedule — only a republished Scene (which re-prepares it) or a new channel brings it back. So a slot that is empty on one URL and full on another is normally a dismissal, not a deploy or a targeting problem; check the remote-data payload (`GET https://aswpapieu.com/api/remote-data/app/<appkey>/web/?sdk_version=…` with the web token as bearer) to read the live schedule, its `embedded_id` and its limits.
+
+Rotating the channel is the app's own lever: **Reset channel** in the Lab panel, or `?reset=1` on any URL, which empties every IndexedDB object store plus `localStorage` on a page that has not loaded the SDK yet, then redirects to the clean URL. Verified twice in a row: dismiss the Scene, reset, and it renders again under a new channel ID.
+
+It empties the stores rather than deleting the databases on purpose. `indexedDB.deleteDatabase` on the SDK's stores (`_ua_sdk:<appkey>:/…`) is blocked whenever another client still holds a connection — a live page, or the `push-worker.js` service worker — and a blocked delete stays queued, so every later open waits on it. `window.UA` then never settles: the script downloads (200) but `_async_setup` is never called, no error and no rejection, and the app sits on "Loading Airship Web SDK…" until the whole browser is closed. The app now trips a 10 s watchdog on that state instead of hanging silently.
+
+## Message Center on TV
+
+The Android inbox (`ui/inbox/InboxScreen.kt`) is a custom two-pane layout, not `MessageCenterScreen`:
+
+- The SDK's list items have no D-pad focus state, so the list is app-owned (tv-material3 surfaces, brand colours, separate focus vs selected states).
+- Only the message body comes from the SDK (`MessageCenterMessage`). Its ViewModel resolves the message at creation, so each selection gets its own `ViewModelStoreOwner` inside a `key(messageId)` block. `MessageCenterState.selectMessage()` is broken in 20.11.0 and cannot be used.
+- The body WebView keeps focus once entered, so the delete action is app-owned, reached by explicit `focusProperties` routing from the list, and Back is what leaves a message.
+
+## Catalogue media
+
+The catalogue is decoration for Airship overlays, so every tile plays the same short trailer (`SAMPLE_STREAM`). The old `commondatastorage.googleapis.com/gtv-videos-bucket` source now answers 403 on everything, images and video alike, and must not be used again.
+
+Tile artwork is a frame Wikimedia Commons renders from the film it hosts, which keeps the still matching the title. Two constraints come with that host:
+
+- Wikimedia rejects OkHttp's default `okhttp/x.y` User-Agent with a 403, which silently leaves every tile blank. Coil is configured in `CtvApplication` to send an app-specific User-Agent instead. tvOS needs nothing: URLSession already sends a descriptive one.
+- Only the default frame is requested. Passing an explicit `thumbtime` triggers on-demand extraction and gets rate-limited (429).

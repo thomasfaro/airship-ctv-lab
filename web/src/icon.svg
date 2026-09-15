@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="130" height="130" viewBox="0 0 130 130">
+  <rect width="130" height="130" rx="20" fill="#141414"/>
+  <rect x="9" y="9" width="112" height="112" rx="15" fill="none" stroke="#e50914" stroke-width="6"/>
+  <text x="65" y="74" fill="#fff" font-family="Arial,sans-serif" font-size="30" font-weight="900" text-anchor="middle">CTV</text>
+  <rect x="35" y="87" width="60" height="7" rx="3.5" fill="#e50914"/>
+</svg>

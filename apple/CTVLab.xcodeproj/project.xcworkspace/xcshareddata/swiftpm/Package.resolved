@@ -1,0 +1,15 @@
+{
+  "originHash" : "35a1c305ac5db66f212019d95b96353f7a7b7a4ee8bea7bca7950156a037f9ea",
+  "pins" : [
+    {
+      "identity" : "ios-library",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/urbanairship/ios-library",
+      "state" : {
+        "revision" : "b7adc1fad1085899fe54f07f83adc7f37e31a30b",
+        "version" : "20.11.0"
+      }
+    }
+  ],
+  "version" : 3
+}

@@ -1,0 +1,14 @@
+{
+  "id": "com.airship.ctvlab.webos",
+  "version": "0.1.0",
+  "vendor": "Airship",
+  "type": "web",
+  "main": "index.html",
+  "title": "CTV Lab",
+  "icon": "icon.svg",
+  "appDescription": "Airship Web SDK Embedded Scene lab for LG TV",
+  "resolution": "1920x1080",
+  "iconColor": "#e50914",
+  "disableBackHistoryAPI": true,
+  "requiredACG": []
+}

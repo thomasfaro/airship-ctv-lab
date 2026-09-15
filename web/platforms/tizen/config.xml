@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget
+  xmlns="http://www.w3.org/ns/widgets"
+  xmlns:tizen="http://tizen.org/ns/widgets"
+  id="https://airship.com/ctvlab/tizen"
+  version="0.1.0"
+  viewmodes="maximized"
+>
+  <tizen:application id="CTVLabWeb1.TV" package="CTVLabWeb1" required_version="5.5"/>
+  <content src="https://airship-ctv-web-lab.netlify.app/?platform=tizen&amp;ntl-drawer-state=hidden"/>
+  <name>CTV Lab</name>
+  <description>Airship Web SDK Embedded Scene lab for Samsung TV</description>
+  <feature name="http://tizen.org/feature/screen.size.normal.1080.1920"/>
+  <access origin="*" subdomains="true"/>
+  <tizen:allow-navigation origin="https://airship-ctv-web-lab.netlify.app"/>
+  <tizen:privilege name="http://tizen.org/privilege/internet"/>
+  <tizen:privilege name="http://tizen.org/privilege/tv.inputdevice"/>
+  <tizen:profile name="tv-samsung"/>
+  <tizen:content-security-policy>
+    default-src * data: blob: 'unsafe-inline' 'unsafe-eval';
+    connect-src *;
+    img-src * data: blob:;
+    media-src * blob:;
+    script-src * 'unsafe-inline' 'unsafe-eval';
+    style-src * 'unsafe-inline';
+  </tizen:content-security-policy>
+  <tizen:setting
+    screen-orientation="landscape"
+    context-menu="disable"
+    background-support="disable"
+    encryption="disable"
+    install-location="auto"
+    hwkey-event="enable"
+  />
+</widget>

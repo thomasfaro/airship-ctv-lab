@@ -1,0 +1,29 @@
+{
+  "dimensions": {
+    "width": 1800,
+    "height": 560
+  },
+  "intro": "monthly-releases-intro.gif",
+  "slides": [
+    {
+      "file": "sintel.jpg",
+      "film_id": "sintel",
+      "cta_url": "https://airship-ctv-web-lab.netlify.app/play/sintel"
+    },
+    {
+      "file": "spring.jpg",
+      "film_id": "spring",
+      "cta_url": "https://airship-ctv-web-lab.netlify.app/play/spring"
+    },
+    {
+      "file": "tears-of-steel.jpg",
+      "film_id": "tears-of-steel",
+      "cta_url": "https://airship-ctv-web-lab.netlify.app/play/tears-of-steel"
+    },
+    {
+      "file": "big-buck-bunny.jpg",
+      "film_id": "big-buck-bunny",
+      "cta_url": "https://airship-ctv-web-lab.netlify.app/play/big-buck-bunny"
+    }
+  ]
+}
