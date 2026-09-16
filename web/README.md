@@ -4,7 +4,29 @@ One shared HTML5 application packaged for both TV platforms. It uses the Airship
 Web SDK v2 and registers two Embedded Content IDs on the home screen:
 `home_top` above `home_banner`, the latter being the ID shared with the native
 labs. Both slots are laid out identically, so a Scene published for either one
-gets the same width and the same unconstrained height.
+is rendered in the same box.
+
+## Slot dimensions
+
+Both slots are `width: 100%` inside a section with `padding: 0 60px`
+(`src/styles.css`), so each one is **the viewport width minus 120 px** — 1800
+CSS px on a 1920 × 1080 TV, at `devicePixelRatio` 1. That width is the same in
+every state, so a Scene is always measured against it.
+
+The height is left to the Scene: the slot has no height of its own and grows
+with its content. A rendered slot carries a `min-height: 132px` floor, which
+gives a Scene authored in percentages something to resolve against. An empty
+slot is 1800 × 0.
+
+## Empty slots
+
+A slot with no eligible content renders nothing at all: no placeholder, no
+label, no box, no height. Both sections stay in the document so the SDK always
+has a full-width target to render into, and `src/app.js` adds
+`has-embedded-content` to a section once it sees content attached — a child that
+has height, carries text, or is a media element, which is what tells a rendered
+Scene apart from the empty wrapper the SDK leaves behind. Dismissing a Scene
+empties the slot and collapses the section again.
 
 ## Airship configuration
 
@@ -54,8 +76,9 @@ Hosted test app:
 
 Create an Embedded Content view style for the **Web** channel with ID
 `home_banner` or `home_top`, then publish a Web Scene targeting `ctv_lab`,
-`tizen`, `webos`, or named user `thomasfctv`. A slot with no eligible content
-keeps its dashed placeholder.
+`tizen`, `webos`, or named user `thomasfctv`. Until a Scene is eligible the home
+screen shows the hero and the catalogue with nothing in between, so the Lab
+panel diagnostics are what tell an empty slot apart from a broken one.
 
 ## Player URL (Scene CTA target)
 

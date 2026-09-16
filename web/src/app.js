@@ -187,16 +187,82 @@
       });
   }
 
+  function sectionOf(element) {
+    var node = element.parentNode;
+    while (node && node.classList) {
+      if (node.classList.contains("embedded-section")) return node;
+      node = node.parentNode;
+    }
+    return null;
+  }
+
+  // An empty wrapper is what the SDK leaves behind when nothing is eligible, so a
+  // child only counts when it actually draws: it has height, it carries text, or
+  // it is a media element still loading its intrinsic size.
+  function draws(element) {
+    if (element.offsetHeight > 0) return true;
+    if (/^(IMG|PICTURE|VIDEO|IFRAME|CANVAS|OBJECT|EMBED|svg)$/.test(element.tagName || "")) {
+      return true;
+    }
+    var text = element.textContent;
+    return !!(text && text.replace(/\s+/g, "").length);
+  }
+
+  function hasContent(root) {
+    var children = root.children || [];
+    var i;
+
+    for (i = 0; i < children.length; i += 1) {
+      if (draws(children[i])) return true;
+      if (children[i].shadowRoot && hasContent(children[i].shadowRoot)) return true;
+      if (hasContent(children[i])) return true;
+    }
+    return false;
+  }
+
+  function slotIsFilled(slot) {
+    if (hasContent(slot.element)) return true;
+    return !!(slot.element.shadowRoot && hasContent(slot.element.shadowRoot));
+  }
+
+  function reflectSlot(slot) {
+    var filled = slotIsFilled(slot);
+    if (filled === slot.filled) return;
+    slot.filled = filled;
+    if (slot.section) slot.section.classList.toggle("has-embedded-content", filled);
+    log(
+      (filled ? "Embedded content attached to " : "Embedded content cleared from ") +
+        slot.embeddedId +
+        ".",
+    );
+  }
+
+  // A Scene sizes itself as its media loads, and the first pass after an insertion
+  // reports content of zero height, so the state is re-read a few times.
   function observeEmbeddedContent() {
-    if (!window.MutationObserver) return;
     embeddedSlots.forEach(function (slot) {
-      new MutationObserver(function () {
-        var placeholder = slot.element.querySelector(".embedded-placeholder");
-        if (placeholder && slot.element.children.length > 1) {
-          placeholder.parentNode.removeChild(placeholder);
-          log("Embedded content attached to " + slot.embeddedId + ".");
-        }
-      }).observe(slot.element, { childList: true, subtree: false });
+      slot.section = sectionOf(slot.element);
+      slot.filled = false;
+
+      function check() {
+        reflectSlot(slot);
+      }
+
+      function recheck() {
+        [0, 150, 600, 1500].forEach(function (delay) {
+          setTimeout(check, delay);
+        });
+      }
+
+      if (window.MutationObserver) {
+        new MutationObserver(recheck).observe(slot.element, { childList: true, subtree: true });
+      }
+      // Covers a Scene the SDK renders into a shadow root of the slot itself, where
+      // no mutation of the slot's own children is ever observed.
+      if (window.ResizeObserver) {
+        new ResizeObserver(check).observe(slot.element);
+      }
+      recheck();
     });
   }
 
