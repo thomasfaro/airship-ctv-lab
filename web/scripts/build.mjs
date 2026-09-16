@@ -16,13 +16,17 @@ const PLACEHOLDER_VALUES = new Set([
   "YOUR_WEB_VAPID_PUBLIC_KEY",
 ]);
 
-function envValue(...names) {
-  for (const name of names) {
-    const value = process.env[name];
-    if (value && !PLACEHOLDER_VALUES.has(value.trim())) return value.trim();
-  }
-  return "";
-}
+// Web-channel values already served by the live lab. This is a demo app: they
+// are baked in so Netlify can build without env vars or the gitignored
+// properties file. The mobile App Secret is not among them and must stay out.
+const DEMO_WEB_CREDENTIALS = {
+  "airship.appKey": "YHUkQYpDRbCnHeXXYvQcKg",
+  "airship.webToken":
+    "MTpZSFVrUVlwRFJiQ25IZVhYWXZRY0tnOnRZMXc3eFVzZVBjcVFhZ0hwZFFGNHc4SmJOTFdCWUVHQ2l5ZGRMQkItbms",
+  "airship.webVapidPublicKey":
+    "BC3RGg_3FrplDsju5H8IivlIiHHQgRqoofCoDa2qGNygslCRv7jya5T6PTLX4oEeCeIoT_sUdLXUZaG2OJ94YPE=",
+  "airship.site": "eu",
+};
 
 function fileValue(properties, key) {
   const value = properties[key];
@@ -51,49 +55,26 @@ async function readProperties(path) {
   }
 }
 
-// Local builds read config/airship.local.properties. Netlify has no copy of that
-// gitignored file, so the same keys come from environment variables instead.
-// airship.appSecret is dropped even if present: it belongs to the mobile apps.
+// Local builds may still overlay optional Web extras from
+// config/airship.local.properties. airship.appSecret is dropped even if present.
 function webCredentials(fileProperties) {
   const properties = { ...fileProperties };
   delete properties["airship.appSecret"];
 
-  const filled = {
+  return {
     "airship.appKey":
-      fileValue(properties, "airship.appKey") || envValue("AIRSHIP_APP_KEY", "airship.appKey"),
+      fileValue(properties, "airship.appKey") || DEMO_WEB_CREDENTIALS["airship.appKey"],
     "airship.site":
-      fileValue(properties, "airship.site") || envValue("AIRSHIP_SITE", "airship.site") || "eu",
+      fileValue(properties, "airship.site") || DEMO_WEB_CREDENTIALS["airship.site"],
     "airship.webToken":
-      fileValue(properties, "airship.webToken") || envValue("AIRSHIP_WEB_TOKEN", "airship.webToken"),
+      fileValue(properties, "airship.webToken") || DEMO_WEB_CREDENTIALS["airship.webToken"],
     "airship.webVapidPublicKey":
       fileValue(properties, "airship.webVapidPublicKey") ||
-      envValue("AIRSHIP_WEB_VAPID_PUBLIC_KEY", "airship.webVapidPublicKey"),
-    "airship.webDefaultIcon":
-      fileValue(properties, "airship.webDefaultIcon") ||
-      envValue("AIRSHIP_WEB_DEFAULT_ICON", "airship.webDefaultIcon"),
-    "airship.webDefaultTitle":
-      fileValue(properties, "airship.webDefaultTitle") ||
-      envValue("AIRSHIP_WEB_DEFAULT_TITLE", "airship.webDefaultTitle"),
-    "airship.webDefaultActionURL":
-      fileValue(properties, "airship.webDefaultActionURL") ||
-      envValue("AIRSHIP_WEB_DEFAULT_ACTION_URL", "airship.webDefaultActionURL"),
+      DEMO_WEB_CREDENTIALS["airship.webVapidPublicKey"],
+    "airship.webDefaultIcon": fileValue(properties, "airship.webDefaultIcon"),
+    "airship.webDefaultTitle": fileValue(properties, "airship.webDefaultTitle"),
+    "airship.webDefaultActionURL": fileValue(properties, "airship.webDefaultActionURL"),
   };
-
-  const missing = ["airship.appKey", "airship.webToken", "airship.webVapidPublicKey"].filter(
-    (key) => !filled[key] || PLACEHOLDER_VALUES.has(filled[key]),
-  );
-  if (missing.length) {
-    throw new Error(
-      "Missing Airship Web credentials: " +
-        missing.join(", ") +
-        ". For a local build, set them in config/airship.local.properties. " +
-        "For Netlify, set AIRSHIP_APP_KEY, AIRSHIP_WEB_TOKEN and " +
-        "AIRSHIP_WEB_VAPID_PUBLIC_KEY from Training app → Settings → Channels → Web → Install SDK. " +
-        "Do not set airship.appSecret: it is never copied into the HTML app.",
-    );
-  }
-
-  return filled;
 }
 
 function runtimeConfig(properties, platform) {
@@ -141,15 +122,9 @@ async function copyApp(target, properties, platform) {
   await writeFile(join(target, "push-worker.js"), pushWorker(properties));
 }
 
-let properties;
-try {
-  properties = webCredentials(
-    await readProperties(join(repoRoot, "config", "airship.local.properties")),
-  );
-} catch (error) {
-  console.error(error.message || error);
-  process.exit(1);
-}
+const properties = webCredentials(
+  await readProperties(join(repoRoot, "config", "airship.local.properties")),
+);
 
 await rm(output, { recursive: true, force: true });
 

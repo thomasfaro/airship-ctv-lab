@@ -30,10 +30,11 @@ empties the slot and collapses the section again.
 
 ## Airship configuration
 
-The mobile App Secret must never be embedded in HTML. In the Airship **Training
-app** project, enable/configure the Web channel, then copy the values from
-**Settings → Channels → Web → Install SDK** into
-`config/airship.local.properties`:
+The mobile App Secret must never be embedded in HTML. The Web App Key, token
+and VAPID public key for this demo are baked into `scripts/build.mjs` (the
+same values already served at `/airship-config.js` on the live lab). A local
+`config/airship.local.properties` can still override them or supply optional
+Web extras; `airship.appSecret` is dropped even if that file contains it.
 
 ```properties
 airship.appKey=...
@@ -44,16 +45,9 @@ airship.webVapidPublicKey=...
 ```
 
 The build generates `airship-config.js` separately for each platform. It
-contains only the Web-safe App Key, token and VAPID public key. If those three
-are missing, the build exits instead of writing an empty config.
-
-A Netlify production build does not have `config/airship.local.properties`
-(gitignored). The same keys are then read from environment variables:
-`AIRSHIP_APP_KEY`, `AIRSHIP_WEB_TOKEN`, `AIRSHIP_WEB_VAPID_PUBLIC_KEY`, and
-optionally `AIRSHIP_SITE` (defaults to `eu`). The repo root `netlify.toml`
-points the site at `web` / `npm run build` / `dist/browser`. Never set the
-mobile App Secret as a Netlify variable: the build drops `airship.appSecret`
-even if it is present.
+contains only the Web-safe App Key, token and VAPID public key. The repo root
+`netlify.toml` points the site at `web` / `npm run build` / `dist/browser`, so
+a Git-connected Netlify site can build with no environment variables.
 
 At launch the app:
 
