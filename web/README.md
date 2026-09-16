@@ -44,7 +44,16 @@ airship.webVapidPublicKey=...
 ```
 
 The build generates `airship-config.js` separately for each platform. It
-contains only the Web-safe App Key, token and VAPID public key.
+contains only the Web-safe App Key, token and VAPID public key. If those three
+are missing, the build exits instead of writing an empty config.
+
+A Netlify production build does not have `config/airship.local.properties`
+(gitignored). The same keys are then read from environment variables:
+`AIRSHIP_APP_KEY`, `AIRSHIP_WEB_TOKEN`, `AIRSHIP_WEB_VAPID_PUBLIC_KEY`, and
+optionally `AIRSHIP_SITE` (defaults to `eu`). The repo root `netlify.toml`
+points the site at `web` / `npm run build` / `dist/browser`. Never set the
+mobile App Secret as a Netlify variable: the build drops `airship.appSecret`
+even if it is present.
 
 At launch the app:
 
