@@ -9,7 +9,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -376,6 +375,8 @@ private const val BannerAspectRatio = 1800f / 560f
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HomeBanner(state: AirshipEmbeddedViewState) {
+    if (!state.isAvailable) return
+
     val host = LocalView.current
     val scope = rememberCoroutineScope()
     val bringIntoView = remember { BringIntoViewRequester() }
@@ -427,7 +428,6 @@ private fun HomeBanner(state: AirshipEmbeddedViewState) {
                 .height(with(LocalDensity.current) { parentHeight.toDp() }),
             parentWidthProvider = { parentWidth },
             parentHeightProvider = { parentHeight },
-            placeholder = { HomeBannerPlaceholder() },
         )
     }
 }
@@ -439,37 +439,6 @@ private fun View.findThomasEmbeddedView(): View? {
         getChildAt(index).findThomasEmbeddedView()?.let { return it }
     }
     return null
-}
-
-
-@Composable
-private fun HomeBannerPlaceholder() {
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .aspectRatio(BannerAspectRatio),
-    ) {
-        AsyncImage(
-            model = Catalog.continueWatching.first().imageUrl,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
-        )
-        Box(
-            Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.45f)),
-        )
-        Column(
-            Modifier
-                .align(Alignment.CenterStart)
-                .padding(horizontal = 28.dp),
-        ) {
-            Text("AIRSHIP SCENE", color = Netflix.Red, fontWeight = FontWeight.Bold, letterSpacing = 2.sp, fontSize = 12.sp)
-            Text("home_banner", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 22.sp)
-            Text("Publish an Embedded Content Scene with this ID", color = Netflix.Mute)
-        }
-    }
 }
 
 @Composable
