@@ -466,7 +466,7 @@ private fun HomeBannerPlaceholder() {
                 .padding(horizontal = 28.dp),
         ) {
             Text("AIRSHIP SCENE", color = Netflix.Red, fontWeight = FontWeight.Bold, letterSpacing = 2.sp, fontSize = 12.sp)
-            Text("home_banner", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 22.sp)
+            Text(AirshipIds.HOME_BANNER, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 22.sp)
             Text("Publish an Embedded Content Scene with this ID", color = Netflix.Mute)
         }
     }

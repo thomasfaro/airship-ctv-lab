@@ -2,6 +2,8 @@ package com.airship.ctvlab.ui.lab
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +27,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Button
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.airship.ctvlab.LabInfo
 import com.airship.ctvlab.airship.AirshipLab
 import com.airship.ctvlab.ui.theme.Netflix
 import com.urbanairship.messagecenter.compose.ui.MessageCenterListScreen
@@ -74,6 +77,7 @@ private fun LabContent(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(rememberScrollState())
             .padding(48.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -84,6 +88,11 @@ private fun LabContent(
             "Named user: ${namedUser ?: "not identified"}",
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        InventoryItem("Live site", listOf(LabInfo.LIVE_SITE_URL))
+        InventoryItem("Embedded Content IDs", LabInfo.embeddedContentIds)
+        InventoryItem("Custom components", LabInfo.customComponents)
+        InventoryItem("Available URLs", LabInfo.availableUrls)
+        InventoryItem("Deep links", LabInfo.deepLinks)
 
         Spacer(Modifier.height(8.dp))
         Text("Identify a named user")
@@ -127,5 +136,13 @@ private fun LabContent(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodyMedium,
         )
+    }
+}
+
+@Composable
+private fun InventoryItem(label: String, values: List<String>) {
+    Text(label, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+    values.forEach { value ->
+        Text("• $value", color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

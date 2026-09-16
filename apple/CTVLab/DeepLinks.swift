@@ -32,16 +32,16 @@ final class DeepLinks {
     }
 
     func open(_ url: URL) {
-        guard url.scheme == "ctvlab" else { return }
+        guard url.scheme == LabInfo.deepLinkScheme else { return }
         switch url.host {
-        case "play":
+        case LabInfo.playHost:
             let id = url.path.split(separator: "/").first.map(String.init)
             screen = Catalog.findFilm(id).map(DeepLinkScreen.player)
-        case "inbox":
+        case LabInfo.inboxHost:
             screen = .inbox
-        case "lab":
+        case LabInfo.labHost:
             screen = .lab
-        case "home":
+        case LabInfo.homeHost:
             screen = nil
         default:
             return

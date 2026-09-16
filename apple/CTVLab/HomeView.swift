@@ -132,7 +132,7 @@ struct HomeView: View {
                             .font(.caption.bold())
                             .foregroundStyle(Brand.red)
                             .tracking(2)
-                        Text("home_banner")
+                        Text(AirshipIds.homeBanner)
                             .font(.title2.bold())
                         Text("Publish an Embedded Content Scene with this ID")
                             .foregroundStyle(Brand.mute)
