@@ -60,11 +60,11 @@ private sealed interface Route {
 
 /** `ctvlab://play/<film-id>`, `ctvlab://inbox`, `ctvlab://lab`, `ctvlab://home`. */
 private fun Uri.toRoute(): Route? = when {
-    scheme != "ctvlab" -> null
-    host == "play" -> Catalog.findFilm(pathSegments.firstOrNull())?.let(Route::Player)
-    host == "inbox" -> Route.Inbox
-    host == "lab" -> Route.Lab
-    host == "home" -> Route.Home
+    scheme != LabInfo.DEEP_LINK_SCHEME -> null
+    host == LabInfo.PLAY_HOST -> Catalog.findFilm(pathSegments.firstOrNull())?.let(Route::Player)
+    host == LabInfo.INBOX_HOST -> Route.Inbox
+    host == LabInfo.LAB_HOST -> Route.Lab
+    host == LabInfo.HOME_HOST -> Route.Home
     else -> null
 }
 
