@@ -8,6 +8,32 @@ const repoRoot = resolve(webRoot, "..");
 const source = join(webRoot, "src");
 const output = join(webRoot, "dist");
 
+const PLACEHOLDER_VALUES = new Set([
+  "",
+  "YOUR_APP_KEY",
+  "YOUR_APP_SECRET",
+  "YOUR_WEB_TOKEN",
+  "YOUR_WEB_VAPID_PUBLIC_KEY",
+]);
+
+// Web-channel values already served by the live lab. This is a demo app: they
+// are baked in so Netlify can build without env vars or the gitignored
+// properties file. The mobile App Secret is not among them and must stay out.
+const DEMO_WEB_CREDENTIALS = {
+  "airship.appKey": "YHUkQYpDRbCnHeXXYvQcKg",
+  "airship.webToken":
+    "MTpZSFVrUVlwRFJiQ25IZVhYWXZRY0tnOnRZMXc3eFVzZVBjcVFhZ0hwZFFGNHc4SmJOTFdCWUVHQ2l5ZGRMQkItbms",
+  "airship.webVapidPublicKey":
+    "BC3RGg_3FrplDsju5H8IivlIiHHQgRqoofCoDa2qGNygslCRv7jya5T6PTLX4oEeCeIoT_sUdLXUZaG2OJ94YPE=",
+  "airship.site": "eu",
+};
+
+function fileValue(properties, key) {
+  const value = properties[key];
+  if (!value || PLACEHOLDER_VALUES.has(value)) return "";
+  return value;
+}
+
 async function readProperties(path) {
   try {
     const text = await readFile(path, "utf8");
@@ -27,6 +53,28 @@ async function readProperties(path) {
     if (error.code === "ENOENT") return {};
     throw error;
   }
+}
+
+// Local builds may still overlay optional Web extras from
+// config/airship.local.properties. airship.appSecret is dropped even if present.
+function webCredentials(fileProperties) {
+  const properties = { ...fileProperties };
+  delete properties["airship.appSecret"];
+
+  return {
+    "airship.appKey":
+      fileValue(properties, "airship.appKey") || DEMO_WEB_CREDENTIALS["airship.appKey"],
+    "airship.site":
+      fileValue(properties, "airship.site") || DEMO_WEB_CREDENTIALS["airship.site"],
+    "airship.webToken":
+      fileValue(properties, "airship.webToken") || DEMO_WEB_CREDENTIALS["airship.webToken"],
+    "airship.webVapidPublicKey":
+      fileValue(properties, "airship.webVapidPublicKey") ||
+      DEMO_WEB_CREDENTIALS["airship.webVapidPublicKey"],
+    "airship.webDefaultIcon": fileValue(properties, "airship.webDefaultIcon"),
+    "airship.webDefaultTitle": fileValue(properties, "airship.webDefaultTitle"),
+    "airship.webDefaultActionURL": fileValue(properties, "airship.webDefaultActionURL"),
+  };
 }
 
 function runtimeConfig(properties, platform) {
@@ -74,8 +122,8 @@ async function copyApp(target, properties, platform) {
   await writeFile(join(target, "push-worker.js"), pushWorker(properties));
 }
 
-const properties = await readProperties(
-  join(repoRoot, "config", "airship.local.properties"),
+const properties = webCredentials(
+  await readProperties(join(repoRoot, "config", "airship.local.properties")),
 );
 
 await rm(output, { recursive: true, force: true });
@@ -100,10 +148,3 @@ console.log("Built:");
 console.log(`  ${browser}`);
 console.log(`  ${tizen}`);
 console.log(`  ${webos}`);
-
-if (!properties["airship.webToken"] || !properties["airship.webVapidPublicKey"]) {
-  console.warn(
-    "\nAirship Web credentials are missing. Add airship.webToken and " +
-      "airship.webVapidPublicKey to config/airship.local.properties.",
-  );
-}
