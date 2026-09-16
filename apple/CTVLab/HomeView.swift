@@ -8,14 +8,19 @@ struct HomeView: View {
     var onOpenLab: () -> Void
     var onOpenInbox: () -> Void
     @FocusState private var playFocused: Bool
+    @StateObject private var homeBannerObserver = AirshipEmbeddedObserver(
+        embeddedID: AirshipIds.homeBanner
+    )
 
     var body: some View {
         ScrollView(.vertical) {
             VStack(alignment: .leading, spacing: 0) {
                 featuredHero
-                homeBanner
-                    .padding(.horizontal, 60)
-                    .padding(.top, 8)
+                if !homeBannerObserver.embeddedInfos.isEmpty {
+                    homeBanner
+                        .padding(.horizontal, 60)
+                        .padding(.top, 8)
+                }
                 ForEach(Catalog.rows, id: \.0) { title, shows in
                     CatalogRow(title: title, shows: shows) { show in
                         if show.isLab {
@@ -123,23 +128,7 @@ struct HomeView: View {
             AirshipEmbeddedView(
                 embeddedID: AirshipIds.homeBanner,
                 embeddedSize: AirshipEmbeddedSize(parentBounds: geo.size)
-            ) {
-                ZStack(alignment: .leading) {
-                    PosterImage(url: Catalog.continueWatching.first?.imageURL)
-                    Color.black.opacity(0.45)
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("AIRSHIP SCENE")
-                            .font(.caption.bold())
-                            .foregroundStyle(Brand.red)
-                            .tracking(2)
-                        Text("home_banner")
-                            .font(.title2.bold())
-                        Text("Publish an Embedded Content Scene with this ID")
-                            .foregroundStyle(Brand.mute)
-                    }
-                    .padding(.horizontal, 28)
-                }
-            }
+            )
         }
         .frame(height: 168)
         .clipShape(RoundedRectangle(cornerRadius: 6))
