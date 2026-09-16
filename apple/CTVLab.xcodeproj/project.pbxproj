@@ -11,6 +11,7 @@
 		37FC18AAF515003A74AD5EDE /* AirshipBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 583D5F56D88EA9B179170912 /* AirshipBootstrap.swift */; };
 		3C2D8AF103EA70CAE43A0048 /* AirshipFeatureFlags in Frameworks */ = {isa = PBXBuildFile; productRef = 3D6A976CE17C3E8B0DAE7218 /* AirshipFeatureFlags */; };
 		4F6C6354846C697F9304A9B4 /* DeepLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = C755C663C0C349E2C8B29979 /* DeepLinks.swift */; };
+		501ECF1A342A40E78B0A0011 /* LabInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501ECF1A342A40E78B0A0012 /* LabInfo.swift */; };
 		5506E710EE32ED6345F0C13E /* LabStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0546BCE48769DEE6097331D /* LabStore.swift */; };
 		58955AFAD2D78CF59D80CDDF /* MessageCenterInboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 128B2C2A2DCB87AEEECF1E2D /* MessageCenterInboxView.swift */; };
 		5D48A8D592C5A6723756C178 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D90B15056BE02C172F1192B /* Assets.xcassets */; };
@@ -43,6 +44,7 @@
 		19956C0D4E57CB2F2095B262 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		1B7A0A4E2E910F69E9C1B672 /* AirshipSecrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirshipSecrets.swift; sourceTree = "<group>"; };
 		1CB135023880D4AB48B076D8 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		501ECF1A342A40E78B0A0012 /* LabInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabInfo.swift; sourceTree = "<group>"; };
 		2D1BB0A52A7541A5D9802E8B /* CTVLabUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = CTVLabUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3241CE6EF1D4BDAC3015E81C /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		583D5F56D88EA9B179170912 /* AirshipBootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AirshipBootstrap.swift; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 				1CB135023880D4AB48B076D8 /* HomeView.swift */,
 				19956C0D4E57CB2F2095B262 /* Info.plist */,
 				D0546BCE48769DEE6097331D /* LabStore.swift */,
+				501ECF1A342A40E78B0A0012 /* LabInfo.swift */,
 				F488847FEED9B78B6B7E4A4F /* LabView.swift */,
 				128B2C2A2DCB87AEEECF1E2D /* MessageCenterInboxView.swift */,
 				C01EA68DB44C51951B6940A4 /* PlayerView.swift */,
@@ -254,6 +257,7 @@
 				4F6C6354846C697F9304A9B4 /* DeepLinks.swift in Sources */,
 				AD16F70891C32CECA0BF04EE /* HomeView.swift in Sources */,
 				5506E710EE32ED6345F0C13E /* LabStore.swift in Sources */,
+				501ECF1A342A40E78B0A0011 /* LabInfo.swift in Sources */,
 				FE91559C1C2C316A0BB36F7B /* LabView.swift in Sources */,
 				58955AFAD2D78CF59D80CDDF /* MessageCenterInboxView.swift in Sources */,
 				91CFCBD512FFF71F916B1173 /* PlayerView.swift in Sources */,
