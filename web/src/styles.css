@@ -351,8 +351,10 @@ h1 {
 }
 
 .lab-card {
-  width: 980px;
+  width: min(1120px, 92vw);
+  max-height: 90vh;
   padding: 52px;
+  overflow: auto;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 14px;
   background: #202020;
@@ -379,6 +381,16 @@ h1 {
   margin: 0;
   overflow-wrap: anywhere;
   font-family: monospace;
+}
+
+.lab-card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lab-card li + li {
+  margin-top: 6px;
 }
 
 .lab-card pre {

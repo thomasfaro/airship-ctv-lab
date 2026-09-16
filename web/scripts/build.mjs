@@ -8,6 +8,20 @@ const repoRoot = resolve(webRoot, "..");
 const source = join(webRoot, "src");
 const output = join(webRoot, "dist");
 
+const LIVE_SITE_URL = "https://airship-ctv-web-lab.netlify.app";
+const EMBEDDED_SLOTS = [
+  { selector: "#airship-home-top", embeddedId: "home_top" },
+  { selector: "#airship-home-banner", embeddedId: "home_banner" },
+];
+const WEB_ROUTES = [
+  `${LIVE_SITE_URL}/`,
+  `${LIVE_SITE_URL}/play/<film-id>`,
+  `${LIVE_SITE_URL}/?play=<film-id>`,
+  `${LIVE_SITE_URL}/?platform=tizen&ntl-drawer-state=hidden`,
+  `${LIVE_SITE_URL}/?platform=webos&ntl-drawer-state=hidden`,
+  `${LIVE_SITE_URL}/?reset=1`,
+];
+
 const PLACEHOLDER_VALUES = new Set([
   "",
   "YOUR_APP_KEY",
@@ -85,9 +99,17 @@ function runtimeConfig(properties, platform) {
       vapidPublicKey: properties["airship.webVapidPublicKey"] ?? "",
       site: properties["airship.site"] ?? "eu",
       platform,
-      embeddedSlots: [
-        { selector: "#airship-home-top", embeddedId: "home_top" },
-        { selector: "#airship-home-banner", embeddedId: "home_banner" },
+      liveSiteUrl: LIVE_SITE_URL,
+      embeddedSlots: EMBEDDED_SLOTS,
+      customComponents: [
+        "Airship Web SDK embeddedViews",
+        "App-owned Lab panel, HTML5 player and spatial D-pad navigation",
+      ],
+      availableUrls: WEB_ROUTES,
+      deepLinks: [
+        `${LIVE_SITE_URL}/play/<film-id>`,
+        `${LIVE_SITE_URL}/?play=<film-id>`,
+        "ctvlab://… is native-only (Google TV / tvOS)",
       ],
       namedUser: "thomasfctv",
     },

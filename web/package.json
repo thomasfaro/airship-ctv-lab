@@ -6,6 +6,6 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "serve": "node scripts/serve.mjs",
-    "check": "node --check src/app.js && node --check scripts/build.mjs && node --check scripts/serve.mjs"
+    "check": "node --check src/app.js && node --check scripts/build.mjs && node --check scripts/serve.mjs && npm run build && node scripts/check-dashboard.mjs"
   }
 }

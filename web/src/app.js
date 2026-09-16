@@ -15,6 +15,7 @@
   var platformLabel = document.getElementById("platform-label");
   var labPlatform = document.getElementById("lab-platform");
   var secureContext = document.getElementById("secure-context");
+  var liveSite = document.getElementById("lab-live-site");
   var embeddedSlots = (config.embeddedSlots || [])
     .map(function (slot) {
       return { embeddedId: slot.embeddedId, element: document.querySelector(slot.selector) };
@@ -27,6 +28,28 @@
     platform === "tizen" ? "Samsung Tizen" : platform === "webos" ? "LG webOS" : "Web preview";
   labPlatform.textContent = platform;
   secureContext.textContent = window.isSecureContext ? "yes" : "no";
+
+  function renderList(elementId, values) {
+    var list = document.getElementById(elementId);
+    (values || []).forEach(function (value) {
+      var item = document.createElement("li");
+      item.textContent = value;
+      list.appendChild(item);
+    });
+  }
+
+  liveSite.textContent = config.liveSiteUrl || window.location.origin;
+  renderList(
+    "lab-embedded-ids",
+    embeddedSlots.map(function (slot) {
+      return slot.embeddedId + " (" + config.embeddedSlots.filter(function (entry) {
+        return entry.embeddedId === slot.embeddedId;
+      })[0].selector + ")";
+    }),
+  );
+  renderList("lab-custom-components", config.customComponents);
+  renderList("lab-available-urls", config.availableUrls);
+  renderList("lab-deep-links", config.deepLinks);
 
   function log(message) {
     var value = new Date().toISOString().slice(11, 19) + "  " + message;
