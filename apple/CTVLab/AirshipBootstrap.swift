@@ -9,6 +9,7 @@ import OSLog
 enum AirshipBootstrap {
     private static let log = Logger(subsystem: "com.airship.ctvlab", category: "Airship")
     private static let defaultNamedUser = "thomasfctv"
+    private static var homeVisible = false
 
     static func start() {
         guard AirshipSecrets.isConfigured else {
@@ -35,6 +36,7 @@ enum AirshipBootstrap {
                 Airship.deepLinkDelegate = DeepLinkForwarder.shared
                 identify(defaultNamedUser)
                 refreshIdentity()
+                updateTrackedScreen()
                 Task { @MainActor in
                     for await _ in Airship.channel.identifierUpdates {
                         refreshIdentity()
@@ -55,6 +57,17 @@ enum AirshipBootstrap {
         Task { @MainActor in
             LabStore.shared.namedUser = await Airship.contact.namedUserID
         }
+    }
+
+    /// Ends home tracking while another route is visible so returning emits a fresh screen event.
+    static func setHomeVisible(_ visible: Bool) {
+        homeVisible = visible
+        updateTrackedScreen()
+    }
+
+    private static func updateTrackedScreen() {
+        guard Airship.isFlying else { return }
+        Airship.analytics.trackScreen(homeVisible ? AirshipIds.homeScreen : nil)
     }
 
     static func identify(_ namedUserId: String) {

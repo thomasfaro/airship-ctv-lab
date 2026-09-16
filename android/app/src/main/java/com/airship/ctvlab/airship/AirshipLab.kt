@@ -33,6 +33,7 @@ object AirshipLab {
     val unreadCount: StateFlow<Int> = _unreadCount.asStateFlow()
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private var homeVisible = false
 
     val isConfigured: Boolean
         get() {
@@ -76,8 +77,23 @@ object AirshipLab {
                 "ready"
             }
             Log.i(TAG, "Airship ready. channel=${Airship.channel.id}")
+            updateTrackedScreen()
             observeInbox()
         }
+    }
+
+    /**
+     * Tracks home while it is the visible route. Ending the screen when an overlay or player opens
+     * lets a later return to home emit a new screen event without requiring a new app session.
+     */
+    fun setHomeVisible(visible: Boolean) {
+        homeVisible = visible
+        updateTrackedScreen()
+    }
+
+    private fun updateTrackedScreen() {
+        if (!Airship.isFlying) return
+        Airship.analytics.trackScreen(if (homeVisible) AirshipIds.HOME_SCREEN else null)
     }
 
     fun refreshInbox() {

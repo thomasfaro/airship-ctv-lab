@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.airship.ctvlab.airship.AirshipLab
 import com.airship.ctvlab.data.Catalog
 import com.airship.ctvlab.data.Show
 import com.airship.ctvlab.ui.home.HomeScreen
@@ -71,6 +72,10 @@ private fun Uri.toRoute(): Route? = when {
 @Composable
 private fun CtvLabApp(deepLink: MutableStateFlow<Uri?>) {
     var route by remember { mutableStateOf<Route>(Route.Home) }
+
+    LaunchedEffect(route) {
+        AirshipLab.setHomeVisible(route is Route.Home)
+    }
 
     LaunchedEffect(Unit) {
         deepLink.collect { uri ->

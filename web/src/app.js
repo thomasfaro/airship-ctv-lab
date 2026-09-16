@@ -7,6 +7,7 @@
   var sdk;
   var lastFocused;
   var diagnostics = [];
+  var currentScreen = "home";
 
   var statusText = document.getElementById("sdk-status");
   var statusDot = document.getElementById("sdk-dot");
@@ -63,6 +64,14 @@
     statusText.textContent = message;
     statusDot.className = "status-dot" + (state ? " " + state : "");
     log(message);
+  }
+
+  function trackScreen(screen) {
+    currentScreen = screen;
+    if (!sdk) return Promise.resolve();
+    return sdk.analytics.trackScreen(screen).then(function () {
+      log("Screen tracked: " + screen + ".");
+    });
   }
 
   function missingWebCredentials() {
@@ -189,11 +198,11 @@
         });
       })
       .then(function () {
-        return sdk.analytics.trackScreen("home");
+        return trackScreen(currentScreen);
       })
       .then(function () {
         log(
-          "Screen tracked: home; waiting for " +
+          "Waiting for " +
             embeddedSlots
               .map(function (slot) {
                 return slot.embeddedId;
@@ -459,6 +468,9 @@
   }
 
   function openPlayer(title, filmId) {
+    trackScreen("player").catch(function (error) {
+      log("Screen tracking failed: " + error);
+    });
     lastFocused = deepActiveElement();
     document.getElementById("player-name").textContent = title || "Sintel";
     var player = document.getElementById("player");
@@ -478,11 +490,17 @@
     video.pause();
     player.classList.remove("open");
     player.setAttribute("aria-hidden", "true");
+    trackScreen("home").catch(function (error) {
+      log("Screen tracking failed: " + error);
+    });
     reflectPlayer(null);
     if (lastFocused) lastFocused.focus();
   }
 
   function openLab() {
+    trackScreen("lab").catch(function (error) {
+      log("Screen tracking failed: " + error);
+    });
     lastFocused = deepActiveElement();
     var panel = document.getElementById("lab-panel");
     panel.classList.add("open");
@@ -496,6 +514,9 @@
     var panel = document.getElementById("lab-panel");
     panel.classList.remove("open");
     panel.setAttribute("aria-hidden", "true");
+    trackScreen("home").catch(function (error) {
+      log("Screen tracking failed: " + error);
+    });
     if (lastFocused) lastFocused.focus();
   }
 

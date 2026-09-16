@@ -13,6 +13,9 @@ struct RootView: View {
             .toolbar(.hidden)
         }
         .preferredColorScheme(.dark)
+        .onChange(of: links.screen, initial: true) { _, screen in
+            AirshipBootstrap.setHomeVisible(screen == nil)
+        }
         .fullScreenCover(item: $links.screen) { screen in
             ZStack {
                 Brand.background.ignoresSafeArea()
