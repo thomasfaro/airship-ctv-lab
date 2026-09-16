@@ -176,14 +176,16 @@ h1 {
   gap: 14px;
 }
 
-.embedded-section,
 .catalogue {
   padding: 16px 60px 0;
 }
 
+/* The horizontal padding never changes, so a Scene is measured against the same
+   width whether or not the section is showing: 1800 px on a 1920 px screen. */
 .embedded-section {
   position: relative;
   z-index: 3;
+  padding: 0 60px;
 }
 
 .section-kicker {
@@ -192,30 +194,26 @@ h1 {
 
 .embedded-slot {
   width: 100%;
-  min-height: 132px;
-  border: 2px dashed rgba(255, 255, 255, 0.18);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.035);
   overflow: hidden;
 }
 
-.embedded-slot:has(> :not(.embedded-placeholder)) {
-  border-color: transparent;
+/* Empty is the default state: no label, no box, no height. app.js adds the class
+   once the SDK has attached content, and removes it again on a dismissal. */
+.embedded-section .section-kicker {
+  display: none;
 }
 
-.embedded-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 128px;
-  color: var(--muted);
-  font-size: 18px;
-  gap: 18px;
+.embedded-section.has-embedded-content {
+  padding-top: 16px;
 }
 
-.embedded-placeholder strong {
-  color: white;
-  font-family: monospace;
+.embedded-section.has-embedded-content .section-kicker {
+  display: block;
+}
+
+/* Gives a Scene authored in percentages something to resolve against. */
+.embedded-section.has-embedded-content .embedded-slot {
+  min-height: 132px;
 }
 
 .catalogue {
